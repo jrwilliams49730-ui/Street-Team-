@@ -1,0 +1,1004 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#050505" />
+  <title>Street Team Demo</title>
+  <style>
+    :root {
+      --bg: #050505;
+      --bg2: #0b0b0d;
+      --card: #131315;
+      --card2: #19191d;
+      --line: rgba(255,255,255,.12);
+      --line2: rgba(255,255,255,.07);
+      --text: #f7f7f8;
+      --muted: #a6a6ae;
+      --red: #e1171f;
+      --red2: #9f0d13;
+      --green: #38d66b;
+      --orange: #ffb020;
+      --radius: 18px;
+      --shadow: 0 20px 55px rgba(0,0,0,.55);
+    }* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 50% -10%, rgba(229,23,31,.16), transparent 32%),
+    linear-gradient(180deg, #050505 0%, #09090b 50%, #050505 100%);
+  color: var(--text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  padding-bottom: max(18px, env(safe-area-inset-bottom));
+}
+
+button, input, textarea, select { font: inherit; }
+button { border: 0; cursor: pointer; color: inherit; }
+button:active { transform: scale(.985); }
+
+.app {
+  width: min(460px, 100%);
+  margin: 0 auto;
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgba(255,255,255,.035), transparent 22%), #080809;
+  border-left: 1px solid rgba(255,255,255,.06);
+  border-right: 1px solid rgba(255,255,255,.06);
+  box-shadow: 0 0 80px rgba(0,0,0,.75);
+}
+
+.top-shell {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(8,8,9,.92);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--line2);
+  padding-top: max(10px, env(safe-area-inset-top));
+}
+
+.status-row {
+  height: 56px;
+  display: grid;
+  grid-template-columns: 52px 1fr 52px;
+  align-items: center;
+  padding: 0 12px;
+}
+
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+  background: transparent;
+  display: grid;
+  place-items: center;
+  color: white;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.bell-wrap { position: relative; justify-self: end; }
+.bell-dot {
+  position: absolute;
+  top: 9px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--red);
+  border: 1px solid #050505;
+}
+
+.mini-logo {
+  justify-self: center;
+  width: 48px;
+  height: 58px;
+  position: relative;
+  display: grid;
+  place-items: start center;
+}
+
+.pin {
+  position: relative;
+  width: 42px;
+  height: 52px;
+  background: linear-gradient(145deg, #ef1a23, #9a0b11);
+  border-radius: 50% 50% 56% 56%;
+  transform: rotate(45deg);
+  box-shadow: 0 10px 26px rgba(225,23,31,.22);
+}
+
+.pin:after {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  background: #0b0b0d;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.75);
+}
+
+.pin-text {
+  position: absolute;
+  top: 10px;
+  width: 42px;
+  text-align: center;
+  font-weight: 1000;
+  font-size: 8.5px;
+  line-height: .86;
+  letter-spacing: -.5px;
+  color: white;
+  text-shadow: 1px 1px 0 #000, -1px 1px 0 #000, 0 2px 5px rgba(0,0,0,.7);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.top-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid var(--line2);
+}
+
+.top-tab {
+  height: 44px;
+  background: transparent;
+  color: #d6d6db;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  position: relative;
+}
+
+.top-tab.active { color: var(--red); }
+.top-tab.active:after {
+  content: "";
+  position: absolute;
+  left: 11px;
+  right: 11px;
+  bottom: 0;
+  height: 2px;
+  background: var(--red);
+  border-radius: 99px 99px 0 0;
+}
+
+main { padding: 18px 18px 28px; }
+
+.screen { display: none; animation: fade .17s ease both; }
+.screen.active { display: block; }
+@keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+h1, h2, h3, p { margin-top: 0; }
+.page-title {
+  font-size: 24px;
+  line-height: 1.1;
+  letter-spacing: -.7px;
+  margin-bottom: 10px;
+}
+
+.subcopy {
+  color: var(--muted);
+  line-height: 1.45;
+  font-size: 14px;
+  margin-bottom: 18px;
+}
+
+.center { text-align: center; }
+.red { color: var(--red); }
+.muted { color: var(--muted); }
+
+.mode-title {
+  text-align: center;
+  padding: 18px 8px 8px;
+}
+
+.mode-title h1 {
+  margin: 0 0 8px;
+  font-size: 44px;
+  letter-spacing: -1.4px;
+  line-height: .94;
+  text-transform: uppercase;
+}
+
+.mode-title span { color: var(--red); }
+.mode-title p { color: #d1d1d7; margin-bottom: 0; }
+
+.card {
+  background: linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.02));
+  border: 1px solid var(--line2);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 34px rgba(0,0,0,.24);
+  overflow: hidden;
+}
+
+.choice-card, .row-card, .stat-card, .menu-row, .reward-row, .ticket-card, .form-card {
+  background: linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.022));
+  border: 1px solid var(--line2);
+  border-radius: var(--radius);
+}
+
+.choice-card {
+  min-height: 118px;
+  padding: 16px;
+  display: grid;
+  grid-template-columns: 82px 1fr 28px;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  text-align: left;
+  width: 100%;
+}
+
+.big-icon {
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 25%, rgba(255,255,255,.18), transparent 34%), rgba(225,23,31,.22);
+  border: 1px solid rgba(225,23,31,.55);
+  display: grid;
+  place-items: center;
+  color: var(--red);
+  font-size: 31px;
+}
+
+.choice-card h3, .row-card h3, .form-card h3 { margin: 0 0 5px; font-size: 18px; }
+.choice-card p, .row-card p, .form-card p { color: #c7c7cf; margin: 0; font-size: 13px; line-height: 1.35; }
+.chev { color: #bdbdc5; font-size: 27px; }
+
+.map-card {
+  height: 132px;
+  border-radius: 16px;
+  margin: 12px 0 18px;
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255,255,255,.035) 1px, transparent 1px),
+    linear-gradient(135deg, #222226, #111113);
+  background-size: 38px 38px, 38px 38px, cover;
+}
+
+.map-card:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 42%, rgba(225,23,31,.18), transparent 26%);
+}
+
+.map-pin {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  width: 42px;
+  height: 42px;
+  border-radius: 50% 50% 50% 0;
+  background: var(--red);
+  transform: translate(-50%, -50%) rotate(-45deg);
+  z-index: 2;
+  border: 4px solid #1b1b1f;
+  box-shadow: 0 8px 20px rgba(0,0,0,.45);
+}
+
+.map-pin:after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #0a0a0c;
+  left: 10px;
+  top: 10px;
+}
+
+.filter-btn {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  z-index: 3;
+  min-height: 34px;
+  padding: 0 10px;
+  border-radius: 10px;
+  background: rgba(0,0,0,.58);
+  border: 1px solid var(--line2);
+  font-weight: 850;
+}
+
+.section-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 12px 0 10px;
+}
+
+.section-row h2 { margin: 0; font-size: 18px; letter-spacing: -.3px; }
+.view-all { background: transparent; color: var(--red); font-size: 12px; font-weight: 900; }
+
+.event-list { display: grid; gap: 9px; }
+
+.row-card {
+  padding: 10px;
+  display: grid;
+  grid-template-columns: 68px 1fr 22px;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  text-align: left;
+}
+
+.thumb {
+  width: 68px;
+  height: 68px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2a114a, #141429 42%, #ec38a5);
+  display: grid;
+  place-items: center;
+  color: #ff5bca;
+  font-weight: 1000;
+  font-style: italic;
+  font-size: 13px;
+  line-height: .9;
+  text-align: center;
+  overflow: hidden;
+}
+
+.thumb.comedy {
+  background: linear-gradient(135deg, #2b201b, #0d0d0f);
+  color: #fff;
+  font-style: normal;
+  font-size: 23px;
+}
+
+.thumb.theater {
+  background: linear-gradient(135deg, #271809, #131313);
+  color: #dbb575;
+  font-style: normal;
+  font-size: 24px;
+}
+
+.share-card {
+  margin-top: 12px;
+  padding: 13px;
+  display: grid;
+  grid-template-columns: 64px 1fr 22px;
+  align-items: center;
+  gap: 12px;
+}
+
+.money-icon {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  border: 2px solid var(--red);
+  display: grid;
+  place-items: center;
+  color: var(--red);
+  font-size: 33px;
+  font-weight: 900;
+}
+
+.poster {
+  height: 178px;
+  border-radius: 16px;
+  background: radial-gradient(circle at 65% 25%, rgba(255,70,190,.45), transparent 38%), linear-gradient(135deg, #15092b, #22204b 65%, #07070b);
+  display: grid;
+  place-items: center;
+  color: #ff4ec7;
+  font-size: 43px;
+  line-height: .86;
+  letter-spacing: -1.6px;
+  font-weight: 1000;
+  font-style: italic;
+  text-shadow: 0 0 18px rgba(255,78,199,.55);
+  margin-bottom: 16px;
+}
+
+.detail-lines { display: grid; gap: 15px; margin: 16px 0; }
+.detail-line {
+  display: grid;
+  grid-template-columns: 25px 1fr;
+  gap: 10px;
+  align-items: start;
+  color: #f3f3f5;
+}
+
+.detail-line span:first-child { color: #d8d8dd; }
+.detail-line small { display: block; color: #c4c4cb; margin-top: 3px; line-height: 1.35; }
+
+.btn {
+  min-height: 52px;
+  padding: 0 16px;
+  border-radius: 12px;
+  font-weight: 950;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  background: linear-gradient(180deg, #f02028, #bd1017);
+  box-shadow: 0 12px 26px rgba(225,23,31,.2);
+}
+
+.btn-dark {
+  background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.035));
+  box-shadow: none;
+  border: 1px solid var(--line2);
+}
+
+.btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+
+.ticket-card {
+  padding: 12px;
+  position: relative;
+  overflow: visible;
+}
+
+.ticket-head {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 12px;
+  align-items: start;
+  padding-bottom: 16px;
+  border-bottom: 1px dashed rgba(255,255,255,.14);
+}
+
+.qr {
+  width: 150px;
+  height: 150px;
+  margin: 20px auto 12px;
+  background:
+    linear-gradient(90deg, #fff 10px, transparent 10px) 0 0/20px 20px,
+    linear-gradient(#fff 10px, transparent 10px) 0 0/20px 20px,
+    #111;
+  border: 12px solid #f3f3f3;
+  border-radius: 10px;
+  position: relative;
+}
+
+.qr:before, .qr:after {
+  content: "";
+  position: absolute;
+  width: 31px;
+  height: 31px;
+  border: 8px solid #111;
+  background: #fff;
+  top: 5px;
+}
+.qr:before { left: 5px; }
+.qr:after { right: 5px; }
+.qr .third {
+  position: absolute;
+  width: 31px;
+  height: 31px;
+  border: 8px solid #111;
+  background: #fff;
+  left: 5px;
+  bottom: 5px;
+}
+
+.ticket-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  text-align: center;
+  color: white;
+  margin-top: 10px;
+}
+
+.ticket-grid label { display: block; font-size: 11px; color: var(--muted); font-weight: 850; }
+.ticket-grid strong { display: block; margin-top: 4px; font-size: 18px; }
+
+.points-card {
+  padding: 17px;
+  display: grid;
+  grid-template-columns: 72px 1fr 20px;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 18px;
+}
+
+.star-icon {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: rgba(225,23,31,.16);
+  border: 8px solid rgba(225,23,31,.86);
+  display: grid;
+  place-items: center;
+  color: var(--red);
+  font-size: 26px;
+}
+
+.points-card strong { font-size: 32px; display: block; line-height: 1; }
+
+.reward-list { display: grid; gap: 10px; }
+.reward-row {
+  padding: 10px;
+  display: grid;
+  grid-template-columns: 92px 1fr 24px;
+  align-items: center;
+  gap: 12px;
+}
+
+.gift {
+  height: 66px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #1a1a1d, #080809);
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line2);
+  font-weight: 1000;
+  font-size: 25px;
+}
+.gift small { display: block; font-size: 9px; color: #d8d8dd; margin-top: -7px; }
+
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.stat-card { padding: 15px; min-height: 112px; }
+.stat-card .icon { color: var(--red); font-size: 24px; margin-bottom: 10px; }
+.stat-card strong { display: block; font-size: 27px; line-height: 1; margin-bottom: 5px; }
+.stat-card small { color: var(--green); }
+
+.producer-event-card {
+  padding: 10px;
+  display: grid;
+  grid-template-columns: 110px 1fr 20px;
+  gap: 11px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.producer-event-card .thumb { width: 110px; height: 72px; }
+
+.mini-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0; }
+.mini-stat {
+  background: rgba(255,255,255,.045);
+  border: 1px solid var(--line2);
+  border-radius: 12px;
+  padding: 10px 6px;
+  text-align: center;
+}
+.mini-stat label { font-size: 10px; color: var(--muted); display: block; }
+.mini-stat strong { font-size: 17px; display: block; margin-top: 3px; }
+
+.bar-chart {
+  height: 92px;
+  border-bottom: 1px solid var(--line2);
+  border-left: 1px solid var(--line2);
+  display: flex;
+  align-items: end;
+  gap: 5px;
+  padding: 0 6px 0 10px;
+  margin: 13px 0;
+}
+.bar { flex: 1; background: linear-gradient(180deg, #ff2a32, #a70d13); min-height: 13px; border-radius: 4px 4px 0 0; }
+
+.menu-list { display: grid; gap: 8px; }
+.menu-row {
+  min-height: 48px;
+  padding: 0 13px;
+  display: grid;
+  grid-template-columns: 28px 1fr 20px;
+  align-items: center;
+  text-align: left;
+  width: 100%;
+  font-weight: 850;
+}
+
+.form-card { padding: 14px; }
+.field {
+  min-height: 62px;
+  padding: 11px 12px;
+  border-radius: 13px;
+  background: rgba(255,255,255,.045);
+  border: 1px solid var(--line2);
+  margin-bottom: 9px;
+}
+.field label { display: block; color: white; font-weight: 900; font-size: 13px; margin-bottom: 5px; }
+.field input, .field textarea {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #e8e8ed;
+  padding: 0;
+  font-size: 13px;
+}
+.field textarea { min-height: 58px; resize: none; }
+
+.upload-box {
+  height: 172px;
+  border-radius: 18px;
+  border: 1px dashed rgba(255,255,255,.34);
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: #e8e8ed;
+  margin-bottom: 16px;
+  background: rgba(255,255,255,.025);
+}
+
+.upload-box .up { font-size: 38px; color: #d9d9df; }
+
+.scan-box {
+  height: 170px;
+  border-radius: 18px;
+  background: rgba(255,255,255,.035);
+  border: 1px solid var(--line2);
+  display: grid;
+  place-items: center;
+  text-align: center;
+  margin: 14px 0 18px;
+  position: relative;
+}
+.corner { position: absolute; width: 32px; height: 32px; border-color: var(--red); border-style: solid; }
+.c1 { top: 16px; left: 16px; border-width: 3px 0 0 3px; border-radius: 12px 0 0 0; }
+.c2 { top: 16px; right: 16px; border-width: 3px 3px 0 0; border-radius: 0 12px 0 0; }
+.c3 { bottom: 16px; left: 16px; border-width: 0 0 3px 3px; border-radius: 0 0 0 12px; }
+.c4 { bottom: 16px; right: 16px; border-width: 0 3px 3px 0; border-radius: 0 0 12px 0; }
+.scan-icon { font-size: 54px; color: white; }
+
+.search {
+  min-height: 46px;
+  width: 100%;
+  background: rgba(255,255,255,.045);
+  border: 1px solid var(--line2);
+  border-radius: 12px;
+  padding: 0 12px;
+  color: white;
+  outline: 0;
+  margin-bottom: 10px;
+}
+
+.guest-row {
+  padding: 11px;
+  border-radius: 13px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--line2);
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #b63d96, #5d2f68);
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: 13px;
+}
+.status { font-size: 13px; font-weight: 950; text-align: right; }
+.valid { color: var(--green); }
+.warn { color: var(--orange); }
+.bad { color: #ff5158; }
+
+.ecosystem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.eco-card { padding: 11px; border-radius: 14px; border: 1px solid var(--line2); background: rgba(255,255,255,.035); }
+.eco-card h3 { color: var(--red); font-size: 14px; text-align: center; margin-bottom: 12px; }
+.eco-card .poster { height: 84px; font-size: 24px; border-radius: 10px; margin-bottom: 10px; }
+.eco-card .qr { width: 105px; height: 105px; border-width: 8px; margin: 12px auto; }
+
+.footer-strip {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(225,23,31,.75);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.benefit { display: grid; grid-template-columns: 42px 1fr; gap: 10px; align-items: center; }
+.benefit-icon { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--red); color: white; display: grid; place-items: center; }
+.benefit strong { display: block; font-size: 12px; letter-spacing: .04em; }
+.benefit span { color: var(--muted); font-size: 11px; }
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: max(20px, env(safe-area-inset-bottom));
+  transform: translateX(-50%) translateY(20px);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 99;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  padding: 12px 16px;
+  border-radius: 999px;
+  background: rgba(18,18,21,.96);
+  border: 1px solid var(--line);
+  color: white;
+  font-weight: 900;
+  box-shadow: var(--shadow);
+  text-align: center;
+  transition: .2s ease;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+@media (min-width: 900px) {
+  body { padding: 28px; }
+  .app { border-radius: 34px; overflow: hidden; min-height: auto; max-height: calc(100vh - 56px); overflow-y: auto; }
+}
+
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top-shell">
+      <div class="status-row">
+        <button class="icon-btn" onclick="showToast('Menu opened')">≡</button>
+        <div class="mini-logo" aria-label="Street Team logo">
+          <div class="pin"></div>
+          <div class="pin-text">STREET<br>TEAM</div>
+        </div>
+        <button class="icon-btn bell-wrap" onclick="showToast('Notifications opened')">♧<span class="bell-dot"></span></button>
+      </div>
+      <nav class="top-tabs" id="tabs"></nav>
+    </header><main>
+  <section id="onboarding" class="screen active">
+    <div class="mode-title">
+      <h1>One App / <span>Two Modes</span></h1>
+      <p>For fans. By producers. Together.</p>
+    </div>
+
+    <div class="center" style="margin:22px 0 18px;">
+      <h2 class="page-title">Welcome to Street Team</h2>
+      <p class="subcopy">Whether you're here to discover events or create unforgettable experiences, we've got you.</p>
+      <p class="subcopy" style="margin-bottom:0;">How would you like to get started?</p>
+    </div>
+
+    <button class="choice-card" onclick="setMode('fan')">
+      <div class="big-icon">☷</div>
+      <div><h3>I'm a Fan</h3><p>Find shows, get tickets, share with friends, and earn rewards.</p></div>
+      <div class="chev">›</div>
+    </button>
+
+    <button class="choice-card" onclick="setMode('producer')">
+      <div class="big-icon">▣</div>
+      <div><h3>I'm a Producer</h3><p>Create events, sell tickets, manage shows, and grow your audience.</p></div>
+      <div class="chev">›</div>
+    </button>
+
+    <div class="footer-strip">
+      <div class="benefit"><div class="benefit-icon">🎟</div><div><strong>DISCOVER</strong><span>Find events that move you.</span></div></div>
+      <div class="benefit"><div class="benefit-icon">☷</div><div><strong>SHARE & EARN</strong><span>Spread the word.</span></div></div>
+      <div class="benefit"><div class="benefit-icon">▥</div><div><strong>MANAGE</strong><span>Tools for producers.</span></div></div>
+      <div class="benefit"><div class="benefit-icon">▦</div><div><strong>CHECK-IN</strong><span>Every step of the show.</span></div></div>
+    </div>
+  </section>
+
+  <section id="fanShows" class="screen">
+    <h2 class="page-title">Find Shows Near You</h2>
+    <div class="map-card"><div class="map-pin"></div><button class="filter-btn" onclick="showToast('Filters coming soon')">Filter ☰</button></div>
+    <div class="section-row"><h2>Upcoming Shows</h2><button class="view-all" onclick="showToast('Showing all nearby shows')">View All</button></div>
+    <div class="event-list">
+      <button class="row-card" onclick="openEvent()"><div class="thumb">The<br>Midnight</div><div><h3>The Midnight</h3><p><span class="red">April 27</span><br>The Masquerade</p></div><div class="chev">›</div></button>
+      <button class="row-card" onclick="showToast('Emma Ross opened')"><div class="thumb comedy">JR</div><div><h3>Emma Ross</h3><p><span class="red">April 23</span><br>The Comedy Loft</p></div><div class="chev">›</div></button>
+      <button class="row-card" onclick="showToast('Theatre event opened')"><div class="thumb theater">♜</div><div><h3>Much Ado About Nothing</h3><p><span class="red">May 2</span><br>Milltown Theater</p></div><div class="chev">›</div></button>
+    </div>
+    <button class="share-card card" onclick="switchScreen('share')"><div class="money-icon">$</div><div><h3>Share & Earn</h3><p>Invite friends to shows and earn rewards when they go.</p></div><div class="chev">›</div></button>
+  </section>
+
+  <section id="eventDetail" class="screen">
+    <button class="icon-btn" onclick="switchScreen('fanShows')" style="margin-left:-8px;">‹</button>
+    <div class="poster">The<br>Midnight</div>
+    <h2 class="page-title">The Midnight</h2>
+    <p class="red" style="font-weight:900; margin-top:-5px;">Live in Concert</p>
+    <div class="detail-lines">
+      <div class="detail-line"><span>□</span><div>Saturday, April 27, 2025<small>8:00 PM</small></div></div>
+      <div class="detail-line"><span>◎</span><div>The Masquerade<small>75 Martin Luther King Jr Dr. SW<br>Atlanta, GA</small></div></div>
+      <div class="detail-line"><span>◇</span><div>$29.50 – $49.50<small>General Admission</small></div></div>
+    </div>
+    <button class="btn" onclick="buyTicket()">Buy Tickets</button>
+    <div class="btn-row">
+      <button class="btn btn-dark" onclick="switchScreen('share')">↥ Share Event</button>
+      <button class="btn btn-dark" onclick="showToast('Added to calendar')">□ Add Calendar</button>
+    </div>
+  </section>
+
+  <section id="tickets" class="screen">
+    <h2 class="page-title">My Tickets</h2>
+    <div class="section-row" style="justify-content:flex-start; gap:24px;"><button class="view-all" style="font-size:14px;">Upcoming</button><button class="view-all muted" style="font-size:14px;">Past</button></div>
+    <div class="ticket-card">
+      <div class="ticket-head">
+        <div class="thumb">The<br>Midnight</div>
+        <div><h3 style="margin:0 0 4px;">The Midnight</h3><p style="margin:0; color:#d5d5db; font-size:13px; line-height:1.4;">Live in Concert<br>Sat, April 27, 2025 · 8:00 PM<br>The Masquerade<br>Atlanta, GA</p></div>
+      </div>
+      <div class="qr"><span class="third"></span></div>
+      <p class="center" style="margin-bottom:4px;">General Admission</p>
+      <div class="ticket-grid"><div><label>SEC</label><strong>GA</strong></div><div><label>ROW</label><strong>GA</strong></div><div><label>SEAT</label><strong>128</strong></div></div>
+    </div>
+    <button class="btn btn-dark" style="margin-top:14px;" onclick="showToast('Wallet support coming later')">Add to Wallet</button>
+  </section>
+
+  <section id="share" class="screen">
+    <h2 class="page-title center">Share the Show</h2>
+    <p class="subcopy center">Send a custom message to make your friends want to go.</p>
+    <div class="field" style="min-height:140px;"><textarea id="shareText">You have to check out The Midnight on April 27 at The Masquerade. It's going to be amazing.</textarea><p class="muted" style="text-align:right; margin:7px 0 0; font-size:12px;">78/120</p></div>
+    <p class="muted" style="margin-bottom:8px;">Share Code</p>
+    <div class="card center" style="padding:14px; margin-bottom:12px;"><strong style="font-size:26px; letter-spacing:1px;">S3HXKJ</strong></div>
+    <p class="muted center" style="font-size:12px;">Anyone can use this code to view the show.</p>
+    <button class="btn" onclick="shareCode()">Copy Code</button>
+    <div class="btn-row"><button class="btn btn-dark" onclick="shareCode()">Text</button><button class="btn btn-dark" onclick="shareCode()">Social</button></div>
+  </section>
+
+  <section id="rewards" class="screen">
+    <h2 class="page-title">Rewards</h2>
+    <div class="points-card card"><div class="star-icon">★</div><div><p class="muted" style="margin-bottom:5px;">Your Points</p><strong id="pointsBalance">1,250</strong><p class="muted" style="margin:4px 0 0;">Points Balance</p></div><div class="chev">›</div></div>
+    <h2 style="font-size:18px; margin-bottom:10px;">Redeem Gift Cards</h2>
+    <div class="reward-list">
+      <button class="reward-row" onclick="redeem(500)"><div class="gift">$5<small>GIFT CARD</small></div><div><h3>$5 Gift Card</h3><p class="red">500 Points</p></div><div class="chev">›</div></button>
+      <button class="reward-row" onclick="redeem(900)"><div class="gift">$10<small>GIFT CARD</small></div><div><h3>$10 Gift Card</h3><p class="red">900 Points</p></div><div class="chev">›</div></button>
+      <button class="reward-row" onclick="redeem(2000)"><div class="gift">$25<small>GIFT CARD</small></div><div><h3>$25 Gift Card</h3><p class="red">2,000 Points</p></div><div class="chev">›</div></button>
+    </div>
+  </section>
+
+  <section id="producerDashboard" class="screen">
+    <h2 class="page-title">Producer Dashboard</h2>
+    <p class="subcopy">Welcome back.</p>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="icon">🎟</div><strong>1,248</strong><p>Tickets Sold</p><small>+18% this week</small></div>
+      <div class="stat-card"><div class="icon">↗</div><strong>932</strong><p>Shares</p><small>+24% this week</small></div>
+      <div class="stat-card"><div class="icon">✓</div><strong>675</strong><p>Check-Ins</p><small>+15% this week</small></div>
+      <div class="stat-card"><div class="icon">$</div><strong>$12,430</strong><p>Revenue</p><small>+22% this week</small></div>
+    </div>
+    <div class="section-row"><h2>Upcoming Events</h2><button class="view-all">View All</button></div>
+    <div class="event-list">
+      <button class="row-card"><div class="thumb">The<br>Midnight</div><div><h3>The Midnight</h3><p>Apr 27 · 8:00 PM<br>The Masquerade</p></div><div><strong>648</strong><small class="muted"> Sold</small></div></button>
+      <button class="row-card"><div class="thumb comedy">ER</div><div><h3>Emma Ross</h3><p>May 3 · 9:00 PM<br>The Comedy Loft</p></div><div><strong>312</strong><small class="muted"> Sold</small></div></button>
+    </div>
+    <button class="btn" style="margin-top:14px;" onclick="switchScreen('create')">Create New Event</button>
+  </section>
+
+  <section id="producerHome" class="screen">
+    <h2 class="page-title">Your Events</h2>
+    <div class="producer-event-card card"><div class="thumb">The<br>Midnight</div><div><h3>The Midnight</h3><p>April 27, 2025<br>The Masquerade<br><span class="green">●</span> On Sale</p></div><div class="chev">›</div></div>
+    <div class="section-row"><h2>Sales Overview</h2><button class="view-all">This Month</button></div>
+    <div class="mini-stats"><div class="mini-stat"><label>Tickets Sold</label><strong>1,254</strong></div><div class="mini-stat"><label>Revenue</label><strong>$28,540</strong></div><div class="mini-stat"><label>Check-ins</label><strong>982</strong></div></div>
+    <div class="bar-chart"><div class="bar" style="height:42%"></div><div class="bar" style="height:55%"></div><div class="bar" style="height:68%"></div><div class="bar" style="height:95%"></div><div class="bar" style="height:62%"></div><div class="bar" style="height:79%"></div><div class="bar" style="height:73%"></div><div class="bar" style="height:50%"></div><div class="bar" style="height:44%"></div><div class="bar" style="height:58%"></div><div class="bar" style="height:37%"></div><div class="bar" style="height:49%"></div><div class="bar" style="height:84%"></div><div class="bar" style="height:65%"></div><div class="bar" style="height:52%"></div><div class="bar" style="height:77%"></div><div class="bar" style="height:93%"></div></div>
+    <div class="menu-list">
+      <button class="menu-row" onclick="showToast('Manage events')"><span>□</span><span>Manage Events</span><span>›</span></button>
+      <button class="menu-row" onclick="switchScreen('checkin')"><span>▦</span><span>Scan Tickets</span><span>›</span></button>
+      <button class="menu-row" onclick="showToast('Payouts coming later')"><span>$</span><span>Payouts</span><span>›</span></button>
+    </div>
+  </section>
+
+  <section id="create" class="screen">
+    <button class="icon-btn" onclick="switchScreen('producerHome')" style="margin-left:-8px;">‹</button>
+    <h2 class="page-title center">Create Event</h2>
+    <p class="subcopy center">Add the details for your new event.</p>
+    <div class="form-card">
+      <div class="field"><label>Event Title</label><input value="The Midnight Live in Concert"></div>
+      <div class="field"><label>Date & Time</label><input value="Apr 27, 2025 · 8:00 PM"></div>
+      <div class="field"><label>Venue</label><input value="The Masquerade · Atlanta, GA"></div>
+      <div class="field"><label>Category</label><input value="Concert"></div>
+      <div class="field"><label>Ticket Price</label><input value="$29.50"></div>
+      <div class="field"><label>Description</label><textarea>Tell people more about your event...</textarea></div>
+    </div>
+    <button class="btn" style="margin-top:14px;" onclick="switchScreen('upload')">Continue</button>
+  </section>
+
+  <section id="upload" class="screen">
+    <button class="icon-btn" onclick="switchScreen('create')" style="margin-left:-8px;">‹</button>
+    <h2 class="page-title center">Upload Flyer</h2>
+    <p class="subcopy center">Add a flyer to promote your event.</p>
+    <div class="upload-box" onclick="showToast('Flyer upload opened')"><div><div class="up">↥</div><strong>Drag your image here,<br>or tap to select</strong><p class="muted" style="margin:8px 0 0; font-size:12px;">JPG or PNG, max 10MB</p></div></div>
+    <h2 style="font-size:16px;">Event Details Preview</h2>
+    <div class="row-card"><div class="thumb">The<br>Midnight</div><div><h3>The Midnight</h3><p>Apr 27, 2025 · 8:00 PM<br>The Masquerade<br>Atlanta, GA<br>$29.50 – $49.50</p></div><div></div></div>
+    <button class="btn" style="margin-top:14px;" onclick="showToast('Event saved')">Save & Continue</button>
+  </section>
+
+  <section id="checkin" class="screen">
+    <h2 class="page-title">Check-In / Door</h2>
+    <p class="subcopy">Scan tickets and manage entry.</p>
+    <div class="scan-box" onclick="scanTicket()"><span class="corner c1"></span><span class="corner c2"></span><span class="corner c3"></span><span class="corner c4"></span><div><div class="scan-icon">▦</div><p class="muted">Tap to scan QR code</p></div></div>
+    <h2 style="font-size:18px;">Search Guest List</h2>
+    <input class="search" placeholder="Search by name or email..." />
+    <div class="guest-row"><div class="avatar">JW</div><div><strong>Jacob Williams</strong><p class="muted" style="margin:2px 0 0; font-size:12px;">jacob.w@email.com</p></div><div class="status valid">Valid<br><small>Ticket #S3HXKJ</small></div></div>
+    <div class="guest-row"><div class="avatar" style="background:#555;">SM</div><div><strong>Sarah Martinez</strong><p class="muted" style="margin:2px 0 0; font-size:12px;">sarah.m@email.com</p></div><div class="status warn">Already In<br><small>7:45 PM</small></div></div>
+    <div class="guest-row"><div class="avatar" style="background:#34405d;">DB</div><div><strong>Derek Brooks</strong><p class="muted" style="margin:2px 0 0; font-size:12px;">derek.b@email.com</p></div><div class="status bad">Not Found<br><small>No ticket</small></div></div>
+  </section>
+
+  <section id="ecosystem" class="screen">
+    <h2 class="page-title center">One Ecosystem. Two Sides.</h2>
+    <p class="subcopy center">Fans buy. Producers scan. Same app.</p>
+    <div class="btn-row"><button class="btn" onclick="showToast('Fan purchase view')">Buy Tickets</button><button class="btn btn-dark" onclick="switchScreen('checkin')">Check-In</button></div>
+    <div class="ecosystem-grid" style="margin-top:14px;">
+      <div class="eco-card"><h3>FAN</h3><div class="poster">The<br>Midnight</div><p><strong>The Midnight</strong><br><span class="muted">April 27, 2025 · 8:00 PM<br>The Masquerade</span></p><p>$29.50</p><button class="btn" onclick="buyTicket()">Buy Now</button></div>
+      <div class="eco-card"><h3>PRODUCER</h3><p class="center"><strong>Ready to Scan</strong><br><span class="muted">Point camera at fan's ticket</span></p><div class="qr"><span class="third"></span></div><button class="btn btn-dark" onclick="scanTicket()">Enter Code</button></div>
+    </div>
+  </section>
+</main>
+
+  </div>  <div id="toast" class="toast">Ready</div>  <script>
+    const tabs = document.getElementById('tabs');
+    const toast = document.getElementById('toast');
+    let mode = localStorage.getItem('streetTeamMode') || 'start';
+    let points = Number(localStorage.getItem('streetTeamPoints') || 1250);
+
+    const tabSets = {
+      start: [
+        ['SHOWS', 'onboarding'],
+        ['TICKETS', 'tickets'],
+        ['SHARE', 'share'],
+        ['CREATE', 'create']
+      ],
+      fan: [
+        ['SHOWS', 'fanShows'],
+        ['TICKETS', 'tickets'],
+        ['SHARE', 'share'],
+        ['REWARDS', 'rewards']
+      ],
+      producer: [
+        ['DASHBOARD', 'producerDashboard'],
+        ['EVENTS', 'producerHome'],
+        ['TICKETS', 'ecosystem'],
+        ['CHECK-IN', 'checkin']
+      ]
+    };
+
+    function renderTabs(activeScreen) {
+      const set = tabSets[mode] || tabSets.start;
+      tabs.innerHTML = set.map(([label, screen]) => `<button class="top-tab ${screen === activeScreen ? 'active' : ''}" onclick="switchScreen('${screen}')">${label}</button>`).join('');
+    }
+
+    function switchScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === id));
+      renderTabs(id);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function setMode(nextMode) {
+      mode = nextMode;
+      localStorage.setItem('streetTeamMode', mode);
+      switchScreen(nextMode === 'fan' ? 'fanShows' : 'producerDashboard');
+      showToast(nextMode === 'fan' ? 'Fan Mode selected' : 'Producer Mode selected');
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      clearTimeout(window.toastTimer);
+      window.toastTimer = setTimeout(() => toast.classList.remove('show'), 1700);
+    }
+
+    function openEvent() {
+      switchScreen('eventDetail');
+    }
+
+    function buyTicket() {
+      points += 50;
+      savePoints();
+      switchScreen('tickets');
+      showToast('Ticket purchased · +50 points');
+    }
+
+    function shareCode() {
+      points += 10;
+      savePoints();
+      showToast('Share code copied · +10 points');
+    }
+
+    function redeem(cost) {
+      if (points < cost) return showToast('Not enough points yet');
+      points -= cost;
+      savePoints();
+      showToast('Gift card redeemed');
+    }
+
+    function scanTicket() {
+      showToast('Ticket valid · checked in');
+    }
+
+    function savePoints() {
+      localStorage.setItem('streetTeamPoints', String(points));
+      const balance = document.getElementById('pointsBalance');
+      if (balance) balance.textContent = points.toLocaleString();
+    }
+
+    savePoints();
+    if (mode === 'fan') switchScreen('fanShows');
+    else if (mode === 'producer') switchScreen('producerDashboard');
+    else switchScreen('onboarding');
+  </script></body>
+</html>
